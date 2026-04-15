@@ -1,0 +1,17 @@
+Terraform State File:
+Used to track real infrastructure and map it to your configuration.
+
+Why local state is risky:
+Because multiple team members can overwrite it, causing conflicts and inconsistencies.
+
+Remote backend:
+A shared storage location (like S3) where Terraform state is stored securely for team access.
+
+Example S3 backend block:
+terraform {
+  backend "s3" {
+    bucket = "my-terraform-state-bucket"
+    key    = "state/terraform.tfstate"
+    region = "us-east-1"
+  }
+}
