@@ -124,3 +124,6 @@ Document solutions for:
 ## Goal
 To demonstrate full DevOps lifecycle:
 Provision → Configure → Monitor → Validate → Document
+
+## License
+This project is licensed under the MIT License.
