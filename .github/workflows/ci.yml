@@ -45,7 +45,7 @@ jobs:
         pip install -r requirements.txt
 
     - name: Run Ansible Lint
-          run: ansible-lint ansible/
+      run: ansible-lint ansible/
 
     - name: Ansible Syntax Check
       run: |
