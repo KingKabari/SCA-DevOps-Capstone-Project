@@ -1,12 +1,15 @@
 name: CI
 
-on: 
-  push: ["**"]
-  pull_request: [main]
+on:
+  push:
+    branches: ["**"]
+  pull_request:
+    branches: [main]
 
 jobs:
   terraform:
       runs-on: ubuntu-latest
+
       steps:
         - uses: actions/checkout@v4
         
@@ -14,23 +17,36 @@ jobs:
           with:
             terraform_version: "1.10.0"
 
-        - name: Terraform Check
+        - name: Terraform Init
           working-directory: terraform
-          run: |
-            terraform init -backend=false
-            terraform fmt -check
-            terraform validate
+          run: terraform init -backend=false
 
-    ansible:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
+        - name: Terraform Format Check
+          working-directory: terraform
+          run: terraform fmt -check
 
-      - name: Run Ansible Lint
-       uses: ansible/ansible-lint-action@v6
-       with:
-          path: "ansible/"
+        - name: Terraform Validate
+          working-directory: terraform
+          run: terraform validate
 
-      - name: Ansible Syntax Check
-        run: |
-          ansible-playbook --syntax-check -i ansible/inventory/hosts.ini ansible/playbooks/site.yml
+  ansible:
+  runs-on: ubuntu-latest
+  steps:
+    - uses: actions/checkout@v4
+
+    - name: Set up Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: "3.11"
+    
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+
+    - name: Run Ansible Lint
+          run: ansible-lint ansible/
+
+    - name: Ansible Syntax Check
+      run: |
+        ansible-playbook --syntax-check -i ansible/inventory/hosts.ini ansible/playbooks/site.yml
