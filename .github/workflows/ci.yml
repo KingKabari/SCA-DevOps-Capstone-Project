@@ -8,45 +8,46 @@ on:
 
 jobs:
   terraform:
-      runs-on: ubuntu-latest
+    runs-on: ubuntu-latest
 
-      steps:
-        - uses: actions/checkout@v4
-        
-        - uses: hashicorp/setup-terraform@v3
-          with:
-            terraform_version: "1.10.0"
+    steps:
+      - uses: actions/checkout@v4
 
-        - name: Terraform Init
-          working-directory: terraform
-          run: terraform init -backend=false
+      - uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: "1.10.0"
 
-        - name: Terraform Format Check
-          working-directory: terraform
-          run: terraform fmt -check
+      - name: Terraform Init
+        working-directory: terraform
+        run: terraform init -backend=false
 
-        - name: Terraform Validate
-          working-directory: terraform
-          run: terraform validate
+      - name: Terraform Format Check
+        working-directory: terraform
+        run: terraform fmt -check
+
+      - name: Terraform Validate
+        working-directory: terraform
+        run: terraform validate
 
   ansible:
-  runs-on: ubuntu-latest
-  steps:
-    - uses: actions/checkout@v4
+    runs-on: ubuntu-latest
 
-    - name: Set up Python
-      uses: actions/setup-python@v5
-      with:
-        python-version: "3.11"
-    
-    - name: Install dependencies
-      run: |
-        python -m pip install --upgrade pip
-        pip install -r requirements.txt
+    steps:
+      - uses: actions/checkout@v4
 
-    - name: Run Ansible Lint
-      run: ansible-lint ansible/
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
 
-    - name: Ansible Syntax Check
-      run: |
-        ansible-playbook --syntax-check -i ansible/inventory/hosts.ini ansible/playbooks/site.yml
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Run Ansible Lint
+        run: ansible-lint ansible/
+
+      - name: Ansible Syntax Check
+        run: |
+          ansible-playbook --syntax-check -i ansible/inventory/hosts.ini ansible/playbooks/site.yml
