@@ -1,0 +1,26 @@
+---
+- name: Install pip
+  apt:
+    name: python3-pip
+    state: present
+
+- name: Install Flask 
+  pip:
+    name: flask
+    state: present
+
+- name: Deploy application file
+  copy:
+    src: app.py
+    dest: /var/www/app/app.py
+    mode: '0755'
+
+- name: Start Flask app in background
+  shell: nohup python3 /var/www/app/app.py &
+  args:
+    executable: /bin/bash
+
+- name: Verify app is running on port 5000
+  wait_for:
+    port: 5000
+    timeout: 10

@@ -1,0 +1,5 @@
+---
+- name: restart app
+  shell: |
+    pkill -f app.py || true
+    nohup python3 /var/www/app/app.py &
