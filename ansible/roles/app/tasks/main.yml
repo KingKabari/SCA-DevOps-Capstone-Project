@@ -1,26 +1,27 @@
 ---
 - name: Install pip
-  apt:
+  ansible.builtin.apt:
     name: python3-pip
     state: present
 
-- name: Install Flask 
-  pip:
+- name: Install Flask
+  ansible.builtin.pip:
     name: flask
     state: present
 
 - name: Deploy application file
-  copy:
+  ansible.builtin.copy:
     src: app.py
     dest: /var/www/app/app.py
     mode: '0755'
 
 - name: Start Flask app in background
-  shell: nohup python3 /var/www/app/app.py &
-  args:
+  ansible.builtin.shell:
+    cmd: nohup python3 /var/www/app/app.py &
     executable: /bin/bash
+  changed_when: false
 
 - name: Verify app is running on port 5000
-  wait_for:
+  ansible.builtin.wait_for:
     port: 5000
     timeout: 10

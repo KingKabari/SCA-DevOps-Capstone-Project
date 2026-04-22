@@ -1,5 +1,8 @@
 ---
-- name: restart app
-  shell: |
-    pkill -f app.py || true
-    nohup python3 /var/www/app/app.py &
+- name: Restart app
+  ansible.builtin.shell:
+    cmd: |
+      pkill -f app.py || true
+      nohup python3 /var/www/app/app.py &
+    executable: /bin/bash
+  changed_when: false
