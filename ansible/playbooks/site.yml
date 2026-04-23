@@ -13,3 +13,10 @@
     - name: Confirm Python is ready
       ansible.builtin.debug:
         msg: "Python installed, continuing configuration"
+
+- name: Configure web server (nginx)
+  hosts: web
+  become: true
+  gather_facts: true
+  roles:
+    - web
