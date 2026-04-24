@@ -1,3 +1,3 @@
 db_name: myappdb
 db_user: myuser
-db_password: strongpassword
+db_password: changeme
