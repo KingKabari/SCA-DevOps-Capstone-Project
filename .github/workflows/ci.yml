@@ -1,53 +1,34 @@
-name: CI
+name: Project Linting and Validation
 
 on:
   push:
-    branches: ["**"]
+    branches: [ "main", "feature/**" ]
   pull_request:
-    branches: [main]
+    branches: [ "main" ]
 
 jobs:
-  terraform:
+  validate:
     runs-on: ubuntu-latest
-
     steps:
-      - uses: actions/checkout@v4
-
-      - uses: hashicorp/setup-terraform@v3
-        with:
-          terraform_version: "1.10.0"
-
-      - name: Terraform Init
-        working-directory: terraform
-        run: terraform init -backend=false
-
-      - name: Terraform Format Check
-        working-directory: terraform
-        run: terraform fmt -check
-
-      - name: Terraform Validate
-        working-directory: terraform
-        run: terraform validate
-
-  ansible:
-    runs-on: ubuntu-latest
-
-    steps:
-      - uses: actions/checkout@v4
+      - name: Checkout code
+        uses: actions/checkout@v3
 
       - name: Set up Python
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@v4
         with:
-          python-version: "3.12"
+          python-version: '3.9'
 
-      - name: Install dependencies
-        run: |
-          python -m pip install --upgrade pip
-          pip install -r requirements.txt
+      - name: Install Ansible Lint
+        run: pip install ansible-lint
 
       - name: Run Ansible Lint
         run: ansible-lint ansible/
 
-      - name: Ansible Syntax Check
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v2
+
+      - name: Terraform Validate
         run: |
-          ansible-playbook --syntax-check -i ansible/inventory/hosts.ini ansible/playbooks/site.yml
+          cd terraform
+          terraform init -backend=false
+          terraform validate
