@@ -16,7 +16,7 @@
         msg: "Python installed, continuing configuration"
 
 - name: Configure app node
-  hosts: appservers
+  hosts: app
   become: true
   gather_facts: true
   roles:
