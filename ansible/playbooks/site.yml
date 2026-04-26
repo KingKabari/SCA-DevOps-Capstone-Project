@@ -10,9 +10,9 @@
   become: true
   gather_facts: true
 
-# - name: Configure web server (nginx)
-#   hosts: web
-#   become: true
-#   gather_facts: true
-#   roles:
-#     - web
+- name: Configure web server (nginx)
+  hosts: web
+  become: true
+  gather_facts: true
+  roles:
+    - web

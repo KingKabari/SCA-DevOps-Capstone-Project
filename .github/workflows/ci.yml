@@ -49,7 +49,11 @@ jobs:
 
       - name: Run Ansible Lint
         run: ansible-lint ansible/playbooks/site.yml
+        env:
+          ANSIBLE_ROLES_PATH: ${{ github.workspace }}/ansible/roles
 
       - name: Ansible Syntax Check
         run: |
           ansible-playbook --syntax-check -i ansible/inventory/hosts.ini ansible/playbooks/site.yml
+        env:
+          ANSIBLE_ROLES_PATH: ${{ github.workspace }}/ansible/roles
