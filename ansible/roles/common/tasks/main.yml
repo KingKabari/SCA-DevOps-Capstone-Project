@@ -1,4 +1,25 @@
-- name: Fix apt sources to use HTTPS
+- name: Ensure Python is installed (Bootstrap)
+  ansible.builtin.raw: test -e /usr/bin/python3 || (apt update && apt install -y python3)
+  changed_when: false
+
+- name: Configure temporary HTTP sources for bootstrap
+  ansible.builtin.copy:
+    dest: /etc/apt/sources.list
+    content: |
+      deb http://archive.ubuntu.com/ubuntu jammy main universe
+    mode: '0644'
+
+- name: Install CA certificates and base dependencies
+  ansible.builtin.apt:
+    name:
+      - ca-certificates
+      - python3-apt
+      - curl
+      - gnupg
+    state: present
+    update_cache: true
+
+- name: Configure permanent HTTPS production sources
   ansible.builtin.copy:
     dest: /etc/apt/sources.list
     content: |
@@ -8,11 +29,7 @@
       deb https://security.ubuntu.com/ubuntu jammy-security main restricted universe multiverse
     mode: '0644'
 
-- name: Clean apt cache
-  ansible.builtin.apt:
-    clean: true
-
-- name: Update apt cache with retries
+- name: Final update of apt cache with retries
   ansible.builtin.apt:
     update_cache: true
   register: common_apt_update
@@ -20,14 +37,9 @@
   delay: 10
   until: common_apt_update is succeeded
 
-- name: Ensure Python is installed
-  ansible.builtin.raw: test -e /usr/bin/python3 || (apt update && apt install -y python3)
-  changed_when: false
-
-- name: Install base packages
-  ansible.builtin.apt:
-    name:
-      - python3
-      - python3-apt
-      - curl
+- name: Create application user
+  ansible.builtin.user:
+    name: appuser
+    shell: /bin/bash
+    create_home: true
     state: present

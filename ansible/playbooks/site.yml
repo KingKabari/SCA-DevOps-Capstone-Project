@@ -5,14 +5,10 @@
   roles:
     - common
 
-- name: Post-bootstrap validation
+- name: Gather facts after Python install
   hosts: all
   become: true
   gather_facts: true
-  tasks:
-    - name: Confirm Python is ready
-      ansible.builtin.debug:
-        msg: "Python installed, continuing configuration"
 
 - name: Configure web server (nginx)
   hosts: web

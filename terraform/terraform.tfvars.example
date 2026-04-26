@@ -1,0 +1,9 @@
+# Example overrides for local development. Copy to terraform/terraform.tfvars to apply locally.
+image = "ubuntu:22.04"
+# To switch to service-specific images (optional):
+# image_web = "python:3.11-slim"
+# image_app = "python:3.11-slim"
+# image_db  = "postgres:15"
+
+web_host_port = 8080
+healthcheck_start_period = "180s"
