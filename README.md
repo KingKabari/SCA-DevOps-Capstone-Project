@@ -139,10 +139,11 @@ python -m pip install --upgrade pip
 pip install -r requirements.txt`
 ```
 
-Configuration (Ansible)
+To run the Ansible playbooks
 ```
-# From project root with ansible-env activated
-ansible-playbook -i ansible/inventory/hosts.ini ansible/playbooks/site.yml
+source ansible-env/bin/activate
+cd ansible
+ansible-playbook playbooks/site.yml
 
 # Test connectivity
 ansible all -m ping

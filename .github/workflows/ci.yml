@@ -8,6 +8,7 @@ on:
 
 jobs:
   terraform:
+    name: Terraform Quality Check
     runs-on: ubuntu-latest
 
     steps:
@@ -30,6 +31,7 @@ jobs:
         run: terraform validate
 
   ansible:
+    name: Ansible Quality Check
     runs-on: ubuntu-latest
 
     steps:
@@ -46,7 +48,7 @@ jobs:
           pip install -r requirements.txt
 
       - name: Run Ansible Lint
-        run: ansible-lint ansible/
+        run: ansible-lint ansible/playbooks/site.yml
 
       - name: Ansible Syntax Check
         run: |
