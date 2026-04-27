@@ -1,20 +1,41 @@
-- name: Ensure Python is installed
+- name: Ensure Python is installed (Bootstrap)
   ansible.builtin.raw: test -e /usr/bin/python3 || (apt update && apt install -y python3)
   changed_when: false
 
-- name: Install base packages
+- name: Configure temporary HTTP sources for bootstrap
+  ansible.builtin.copy:
+    dest: /etc/apt/sources.list
+    content: |
+      deb http://archive.ubuntu.com/ubuntu jammy main universe
+    mode: '0644'
+
+- name: Install CA certificates and base dependencies
   ansible.builtin.apt:
     name:
-      - python3
+      - ca-certificates
       - python3-apt
       - curl
-      - ca-certificates
       - gnupg
-      - cron
-      - rsyslog
     state: present
     update_cache: true
-    cache_valid_time: 3600
+
+- name: Configure permanent HTTPS production sources
+  ansible.builtin.copy:
+    dest: /etc/apt/sources.list
+    content: |
+      deb https://archive.ubuntu.com/ubuntu jammy main restricted universe multiverse
+      deb https://archive.ubuntu.com/ubuntu jammy-updates main restricted universe multiverse
+      deb https://archive.ubuntu.com/ubuntu jammy-backports main restricted universe multiverse
+      deb https://security.ubuntu.com/ubuntu jammy-security main restricted universe multiverse
+    mode: '0644'
+
+- name: Final update of apt cache with retries
+  ansible.builtin.apt:
+    update_cache: true
+  register: common_apt_update
+  retries: 5
+  delay: 10
+  until: common_apt_update is succeeded
 
 - name: Create application user
   ansible.builtin.user:
@@ -22,23 +43,3 @@
     shell: /bin/bash
     create_home: true
     state: present
-
-- name: Set up cron job for log rotation
-  ansible.builtin.cron:
-    name: "rotate logs daily"
-    minute: "0"
-    hour: "0"
-    job: "/usr/sbin/logrotate /etc/logrotate.conf"
-
-- name: Ensure application directory exists
-  ansible.builtin.file:
-    path: /var/www/app
-    state: directory
-    owner: appuser
-    group: appuser
-    mode: "0755"
-
-- name: Ensure cron service is started
-  ansible.builtin.service:
-    name: cron
-    state: started

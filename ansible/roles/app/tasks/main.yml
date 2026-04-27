@@ -1,0 +1,54 @@
+---
+- name: Install pip and dependencies
+  ansible.builtin.apt:
+    name:
+      - python3-pip
+      - python3-venv
+      - curl
+    state: present
+    update_cache: true
+
+- name: Create virtual environment
+  ansible.builtin.command:
+    cmd: python3 -m venv /var/www/app/venv
+    creates: /var/www/app/venv
+
+- name: Install Flask and psycopg2 in virtualenv
+  ansible.builtin.pip:
+    name:
+      - flask==3.0.0
+      - psycopg2-binary
+    virtualenv: /var/www/app/venv
+    state: present
+
+- name: Deploy application file
+  ansible.builtin.copy:
+    src: app.py
+    dest: /var/www/app/app.py
+    mode: '0755'
+    owner: appuser
+    group: appuser
+
+- name: Create app environment file
+  ansible.builtin.copy:
+    content: |
+      DB_HOST={{ db_host }}
+      DB_PORT={{ db_port }}
+      DB_NAME={{ db_name }}
+      DB_USER={{ db_user }}
+      DB_PASS={{ db_pass }}
+    dest: /var/www/app/.env
+    mode: '0600'
+    owner: appuser
+    group: appuser
+
+- name: Start Flask app
+  ansible.builtin.shell:
+    cmd: nohup /var/www/app/venv/bin/python3 /var/www/app/app.py &
+    executable: /bin/bash
+  changed_when: false
+
+- name: Verify app is running on port 5000
+  ansible.builtin.wait_for:
+    port: 5000
+    timeout: 10
