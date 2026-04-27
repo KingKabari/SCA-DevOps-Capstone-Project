@@ -3,4 +3,4 @@ db_name: myapp
 db_user: myuser
 db_pass: mypass
 db_port: 5432
-app_node: app_node
+db_app_node: app_node

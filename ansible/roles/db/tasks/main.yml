@@ -19,24 +19,31 @@
     cmd: psql -c "CREATE DATABASE {{ db_name }};"
   become: true
   become_user: postgres
-  ignore_errors: true
-  changed_when: false
+  register: create_db
+  failed_when:
+    - create_db.rc != 0
+    - '"already exists" not in create_db.stderr'
+  changed_when: create_db.rc == 0
 
 - name: Create database user
   ansible.builtin.command:
     cmd: psql -c "CREATE USER {{ db_user }} WITH PASSWORD '{{ db_pass }}';"
   become: true
   become_user: postgres
-  ignore_errors: true
-  changed_when: false
+  register: create_user
+  failed_when:
+    - create_user.rc != 0
+    - '"already exists" not in create_user.stderr'
+  changed_when: create_user.rc == 0
 
 - name: Grant privileges to user
   ansible.builtin.command:
     cmd: psql -c "GRANT ALL PRIVILEGES ON DATABASE {{ db_name }} TO {{ db_user }};"
   become: true
   become_user: postgres
-  ignore_errors: true
-  changed_when: false
+  register: grant_privs
+  failed_when: grant_privs.rc != 0
+  changed_when: grant_privs.rc == 0
 
 - name: Configure PostgreSQL to listen on all interfaces
   ansible.builtin.lineinfile:
@@ -49,7 +56,7 @@
 - name: Allow app_node to connect
   ansible.builtin.lineinfile:
     path: /etc/postgresql/14/main/pg_hba.conf
-    line: "host {{ db_name }} {{ db_user }} {{ app_node }} md5"
+    line: "host {{ db_name }} {{ db_user }} {{ db_app_node }} md5"
     state: present
   notify: Restart postgresql
 
