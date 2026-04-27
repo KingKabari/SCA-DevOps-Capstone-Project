@@ -19,31 +19,31 @@
     cmd: psql -c "CREATE DATABASE {{ db_name }};"
   become: true
   become_user: postgres
-  register: create_db
+  register: db_create_db
   failed_when:
-    - create_db.rc != 0
-    - '"already exists" not in create_db.stderr'
-  changed_when: create_db.rc == 0
+    - db_create_db.rc != 0
+    - '"already exists" not in db_create_db.stderr'
+  changed_when: db_create_db.rc == 0
 
 - name: Create database user
   ansible.builtin.command:
     cmd: psql -c "CREATE USER {{ db_user }} WITH PASSWORD '{{ db_pass }}';"
   become: true
   become_user: postgres
-  register: create_user
+  register: db_create_user
   failed_when:
-    - create_user.rc != 0
-    - '"already exists" not in create_user.stderr'
-  changed_when: create_user.rc == 0
+    - db_create_user.rc != 0
+    - '"already exists" not in db_create_user.stderr'
+  changed_when: db_create_user.rc == 0
 
 - name: Grant privileges to user
   ansible.builtin.command:
     cmd: psql -c "GRANT ALL PRIVILEGES ON DATABASE {{ db_name }} TO {{ db_user }};"
   become: true
   become_user: postgres
-  register: grant_privs
-  failed_when: grant_privs.rc != 0
-  changed_when: grant_privs.rc == 0
+  register: db_grant_privs
+  failed_when: db_grant_privs.rc != 0
+  changed_when: db_grant_privs.rc == 0
 
 - name: Configure PostgreSQL to listen on all interfaces
   ansible.builtin.lineinfile:
