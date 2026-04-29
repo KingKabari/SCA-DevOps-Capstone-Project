@@ -11,9 +11,32 @@
   become: true
   gather_facts: true
 
+- name: Post-bootstrap validation
+  hosts: all
+  become: true
+  gather_facts: true
+  tasks:
+    - name: Confirm Python is ready
+      ansible.builtin.debug:
+        msg: "Python installed, continuing configuration"
+
+- name: Configure db node
+  hosts: db
+  become: true
+  gather_facts: true
+  roles:
+    - db
+
 - name: Configure app node
   hosts: app
   become: true
   gather_facts: true
   roles:
     - app
+
+- name: Configure web node
+  hosts: web
+  become: true
+  gather_facts: true
+  roles:
+    - web

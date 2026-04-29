@@ -1,0 +1,66 @@
+---
+- name: Install PostgreSQL
+  ansible.builtin.apt:
+    name:
+      - postgresql
+      - postgresql-contrib
+      - python3-psycopg2
+    state: present
+    update_cache: true
+
+- name: Ensure PostgreSQL is running
+  ansible.builtin.service:
+    name: postgresql
+    state: started
+    enabled: true
+
+- name: Create database
+  ansible.builtin.command:
+    cmd: psql -c "CREATE DATABASE {{ db_name }};"
+  become: true
+  become_user: postgres
+  register: db_create_db
+  failed_when:
+    - db_create_db.rc != 0
+    - '"already exists" not in db_create_db.stderr'
+  changed_when: db_create_db.rc == 0
+
+- name: Create database user
+  ansible.builtin.command:
+    cmd: psql -c "CREATE USER {{ db_user }} WITH PASSWORD '{{ db_pass }}';"
+  become: true
+  become_user: postgres
+  register: db_create_user
+  failed_when:
+    - db_create_user.rc != 0
+    - '"already exists" not in db_create_user.stderr'
+  changed_when: db_create_user.rc == 0
+
+- name: Grant privileges to user
+  ansible.builtin.command:
+    cmd: psql -c "GRANT ALL PRIVILEGES ON DATABASE {{ db_name }} TO {{ db_user }};"
+  become: true
+  become_user: postgres
+  register: db_grant_privs
+  failed_when: db_grant_privs.rc != 0
+  changed_when: db_grant_privs.rc == 0
+
+- name: Configure PostgreSQL to listen on all interfaces
+  ansible.builtin.lineinfile:
+    path: /etc/postgresql/14/main/postgresql.conf
+    regexp: "^#?listen_addresses"
+    line: "listen_addresses = '*'"
+    state: present
+  notify: Restart postgresql
+
+- name: Allow app_node to connect
+  ansible.builtin.lineinfile:
+    path: /etc/postgresql/14/main/pg_hba.conf
+    line: "host {{ db_name }} {{ db_user }} {{ db_app_node }} md5"
+    state: present
+  notify: Restart postgresql
+
+- name: Verify PostgreSQL is running on port 5432
+  ansible.builtin.wait_for:
+    port: "{{ db_port }}"
+    timeout: 10
