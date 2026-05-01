@@ -158,7 +158,7 @@ Grafana:    http://localhost:3000/login  (login: admin / admin, Node Overview da
 
 # Core Infrastructure Screenshots
 All containers running
-
+![Project Architecture](./architecture.png.png)
 ![Docker Containers](screenshots/docker_ps.png)
 ![Docker Containers](screenshots/docker-containers.png)
 
@@ -190,7 +190,7 @@ Drift Check
 - Abigail Eboda https://github.com/Abbanks
 - Deborah Dogo https://github.com/DeborahDogo
 - https://github.com/FavieCodes
----
+- Victoria Robin https://github.com/Torisbrain
 
 ## Goal
 To demonstrate full DevOps lifecycle:
