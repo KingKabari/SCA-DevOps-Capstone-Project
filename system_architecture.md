@@ -5,6 +5,8 @@
 This is a **three-tier DevOps demonstration project** that provisions and configures a complete application stack using Infrastructure as Code (IaC) and Configuration Management principles. The project simulates a production environment using Docker containers as virtual servers, managed by Terraform and Ansible.
 
 ### Architecture Pattern: Three-Tier Web Application
+
+![system Architecture](./images/SCA_devops_ansible_system_architecture.png.png)
 ```
 ┌─────────────────────────────────────────────────────────────────────┐
 │ EXTERNAL ACCESS │
@@ -237,6 +239,7 @@ Container Communication Flow
     └─────────────┘
     ```
 ## CI/CD Pipeline (GitHub Actions)
+![Deployment Sequence Diagram](./images/Deployment_Sequence_Diagram.png)
 ```text
 ┌─────────────────────────────────────────────────────────────────────┐
 │                        GITHUB ACTIONS CI/CD                          │
